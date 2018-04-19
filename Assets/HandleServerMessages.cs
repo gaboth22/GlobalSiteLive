@@ -1,0 +1,43 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+
+public class HandleServerMessages : MonoBehaviour {
+
+	void Start () {
+		StartCoroutine (WaitForClientInitialization ());
+	}
+
+	IEnumerator WaitForClientInitialization() {
+		yield return new WaitUntil (() => DataModel.ApplicationNetworkClient != null);
+		StartCoroutine (RegisterHandlers ());
+	}
+		
+	IEnumerator RegisterHandlers() {
+		DataModel.ApplicationNetworkClient.RegisterHandler (
+			CustomMessageType.ProfessorPointerPosition,
+			OnProfessorPointerPositionUpdate);
+
+		DataModel.ApplicationNetworkClient.RegisterHandler (
+			CustomMessageType.StartPlayback,
+			OnStartPlaybackMessage);
+		
+		yield return null;
+	}
+
+	void OnProfessorPointerPositionUpdate(NetworkMessage netMsg) {
+		var msg = netMsg.ReadMessage<ProfessorPointerPositionMessage> ();
+		DataModel.ProfessorPointerPosition = msg.position;
+		Debug.Log ("Received updated professor pointer position: " +
+					DataModel.ProfessorPointerPosition.ToString ());
+	}
+
+	void OnStartPlaybackMessage(NetworkMessage netMsg) {
+		var msg = netMsg.ReadMessage<StartPlaybackMessage> ();
+		if (msg.start) {
+			Debug.Log ("Received start playback message");
+			DataModel.VideoPlaybackEnabled = true;
+		}
+	}
+}
