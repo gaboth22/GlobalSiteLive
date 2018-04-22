@@ -841,6 +841,7 @@ GameObject:
   - component: {fileID: 1373555425}
   - component: {fileID: 1373555426}
   - component: {fileID: 1373555427}
+  - component: {fileID: 1373555428}
   m_Layer: 0
   m_Name: 360VideoSkybox
   m_TagString: Untagged
@@ -967,5 +968,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9382b3a3963df4efca510ebd38f82cff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1373555428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1373555418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03d3481dff7d244ffa419f084ab787c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

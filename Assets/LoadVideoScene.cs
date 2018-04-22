@@ -15,16 +15,18 @@ public class LoadVideoScene : MonoBehaviour {
 	public void OnButtonClick() {
 		Debug.Log ("Loading video scene");
 
-		StartCoroutine (CheckIfServerDataHasBeenSaved ());
+		StartCoroutine (CheckIfVideoSceneCanBeLoaded ());
 	}
 
-	IEnumerator CheckIfServerDataHasBeenSaved() {
+	IEnumerator CheckIfVideoSceneCanBeLoaded() {
+		#if UNITY_ANDROID
 		yield return new WaitUntil (() => DataModel.VideoServerPort != -1);
 		yield return new WaitUntil (() => !string.IsNullOrEmpty(DataModel.ServerIpAddress));
+		#else
+		yield return new WaitUntil (() => !string.IsNullOrEmpty(DataModel.YoutubeLiveVideoUrl));
+		#endif
 
 		#if UNITY_ANDROID
-		SceneManager.LoadScene ("360VideoScene");
-		#elif UNITY_IOS
 		SceneManager.LoadScene ("360VideoScene");
 		#else
 		SceneManager.LoadScene ("360VideoSceneDesktop");

@@ -12,6 +12,7 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 	void Start() {
 		videoPlayer = GetComponent<VideoPlayer> ();
 		videoPlayer.loopPointReached += LoadNewVideo;
+		videoPlayer.errorReceived += SkipVideo;
 		shouldAttemptToPlayFirstVideo = true;
 	}
 
@@ -32,9 +33,14 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 		}
 	}
 
+	void SkipVideo(VideoPlayer vidPlayer, string message) {
+		Debug.Log ("Skipping video: " + vidPlayer.url + " because: \n" + message);
+		LoadNewVideo (vidPlayer);
+	}
+
 	IEnumerator StreamVideo() {
 
-		while (DataModel.LocalVideoQueue.Count == 0) {
+		while (DataModel.LocalVideoQueue.Count < 2) {
 			yield return null;
 		}
 
@@ -45,8 +51,14 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 		DataModel.LocalVideoQueueBusy = true;
 
 		if (DataModel.LocalVideoQueue.Count > 0) {
-			videoPlayer.url = DataModel.LocalVideoQueue.Dequeue ();
+			var currentVideoToPlay = DataModel.LocalVideoQueue.Dequeue ();
 			DataModel.LocalVideoQueueBusy = false;
+
+			while (!File.Exists (currentVideoToPlay)) {
+				yield return null;
+			}
+
+			videoPlayer.url = currentVideoToPlay;
 			videoPlayer.Prepare ();
 
 			while (!videoPlayer.isPrepared) {
@@ -54,8 +66,10 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 			}
 			
 			videoPlayer.Play ();
+		} 
+		else {
+			DataModel.LocalVideoQueueBusy = false;
 		}
-		DataModel.LocalVideoQueueBusy = false;
 		yield return null;
 	}
 

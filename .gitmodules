@@ -1,0 +1,3 @@
+[submodule "Assets/YoutubeLiveStream"]
+	path = Assets/YoutubeLiveStream
+	url = https://github.com/gaboth22/YoutubeLiveStream
