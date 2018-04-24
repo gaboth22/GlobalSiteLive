@@ -270,6 +270,7 @@ GameObject:
   - component: {fileID: 594788645}
   - component: {fileID: 594788647}
   - component: {fileID: 594788648}
+  - component: {fileID: 594788649}
   m_Layer: 0
   m_Name: VideoSkybox
   m_TagString: Untagged
@@ -440,6 +441,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52947954118034aab9e4abb937a04640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &594788649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 594788635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949e433cd435b42879a260de61f02ac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &670400909
@@ -707,6 +719,7 @@ GameObject:
   - component: {fileID: 1365319166}
   - component: {fileID: 1365319165}
   - component: {fileID: 1365319164}
+  - component: {fileID: 1365319163}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -714,6 +727,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1365319163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1365319162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -768656878, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 0
 --- !u!124 &1365319164
 Behaviour:
   m_ObjectHideFlags: 0
@@ -919,6 +947,7 @@ GameObject:
   - component: {fileID: 1826368512}
   - component: {fileID: 1826368511}
   - component: {fileID: 1826368510}
+  - component: {fileID: 1826368514}
   m_Layer: 0
   m_Name: Slides
   m_TagString: Untagged
@@ -994,3 +1023,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 5.176, y: -13.537001, z: 3.6490002}
+--- !u!114 &1826368514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1826368509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 594788648}
+          m_MethodName: SwitchCameras
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []

@@ -8,29 +8,24 @@ using System.IO;
 public class StreamVideoIntoSkybox : MonoBehaviour {
 	private VideoPlayer videoPlayer;
 	private bool shouldAttemptToPlayFirstVideo;
+	private WaitUntil waitForQueueToHaveData;
+	private WaitUntil waitForQueueNotToBeBusy;
 
 	void Start() {
 		videoPlayer = GetComponent<VideoPlayer> ();
 		videoPlayer.loopPointReached += LoadNewVideo;
 		videoPlayer.errorReceived += SkipVideo;
 		shouldAttemptToPlayFirstVideo = true;
+		waitForQueueToHaveData = new WaitUntil (() => DataModel.LocalVideoQueue.Count > 0);
+		waitForQueueNotToBeBusy = new WaitUntil (() => !DataModel.LocalVideoQueueBusy);
+		StartCoroutine (PlayFirstVideo ());
 	}
+		
+	IEnumerator PlayFirstVideo() {
+		yield return new WaitUntil (
+			() => DataModel.LocalVideoQueue.Count >= 5 && DataModel.VideoPlaybackEnabled);
 
-	void Update() {
-		if (shouldAttemptToPlayFirstVideo) {
-			if (!DataModel.LocalVideoQueueBusy) {
-				DataModel.LocalVideoQueueBusy = true;
-
-				if (DataModel.LocalVideoQueue.Count >= 5 && DataModel.VideoPlaybackEnabled) {
-					shouldAttemptToPlayFirstVideo = false;
-					DataModel.LocalVideoQueueBusy = false;
-					StartCoroutine (StreamVideo ());
-				} 
-				else {
-					DataModel.LocalVideoQueueBusy = false;
-				}
-			}
-		}
+		yield return StartCoroutine (StreamVideo ());
 	}
 
 	void SkipVideo(VideoPlayer vidPlayer, string message) {
@@ -40,13 +35,8 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 
 	IEnumerator StreamVideo() {
 
-		while (DataModel.LocalVideoQueue.Count < 2) {
-			yield return null;
-		}
-
-		while (DataModel.LocalVideoQueueBusy) {
-			yield return null;
-		}
+		yield return waitForQueueToHaveData;
+		yield return waitForQueueNotToBeBusy;
 
 		DataModel.LocalVideoQueueBusy = true;
 
@@ -70,7 +60,7 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 		else {
 			DataModel.LocalVideoQueueBusy = false;
 		}
-		yield return null;
+		yield break;
 	}
 
 	void LoadNewVideo(VideoPlayer videoPlayer) {

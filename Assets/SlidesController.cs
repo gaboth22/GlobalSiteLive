@@ -62,11 +62,13 @@ public class SlidesController : MonoBehaviour {
 		#endif
 	}
 
+	#if !(UNITY_ANDROID)
 	void EnableOrDisableSlidesThroughKey() {
 		if (Input.GetKeyDown (KeyCode.S)) {
 			DataModel.ShouldDisplaySlides = !DataModel.ShouldDisplaySlides;
 		}
 	}
+	#endif
 
 	void UpdateDisplayedSlides() {
 		if (lastSlidesIndex != DataModel.JpgSlideListIndex) {
@@ -86,6 +88,7 @@ public class SlidesController : MonoBehaviour {
 		}
 	}
 
+	#if !(UNITY_ANDROID)
 	void ChangeSlideThrough3DButtons() {
 		if ( Input.GetMouseButtonDown (0)){ 
 			if (showingFullScreenSlides) {
@@ -111,8 +114,9 @@ public class SlidesController : MonoBehaviour {
 			}
 		}
 	}
+	#endif
 
-	void SwitchCameras() {
+	public void SwitchCameras() {
 		if (mCam.enabled) {
 			slidesCam.enabled = true;
 			mCam.enabled = false;
@@ -123,6 +127,7 @@ public class SlidesController : MonoBehaviour {
 		}
 	}
 
+	#if !(UNITY_ANDROID)
 	void DecreaseIndex() {
 		Debug.Log("Clicked on left slides button");
 		if (DataModel.JpgSlideListIndex > 0) {
@@ -136,4 +141,5 @@ public class SlidesController : MonoBehaviour {
 			DataModel.JpgSlideListIndex++;
 		}
 	}
+	#endif
 }

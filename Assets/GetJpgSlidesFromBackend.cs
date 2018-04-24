@@ -12,6 +12,7 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 	private byte[] rawImageData;
 	private int slideNumber;
 	private string slideExtension = ".jpg";
+	private const int oneHundredK = 100000;
 
 	void Start () {
 		countToAssumeEndOfSlides = 0;
@@ -22,7 +23,7 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 		
 	IEnumerator DelayToStartGettingSlides() {
 		yield return wait20Secs;
-		StartCoroutine (GetJpgSlides ());
+		yield return StartCoroutine (GetJpgSlides ());
 	}
 
 	IEnumerator GetJpgSlides() {
@@ -47,16 +48,30 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 		Debug.Log ("Getting slide: " + fullSlideUrl);
 
 		rawImageData = null;
-		StartCoroutine (GetImageRawData (fullSlideUrl));
+		using (UnityWebRequest www = UnityWebRequest.Get(fullSlideUrl))
+		{
+			www.SetRequestHeader ("User-Agent", DataModel.RequestUserAgent);
+			yield return www.SendWebRequest();
+
+			if (www.isNetworkError || www.isHttpError) {
+				rawImageData = null;
+				countToAssumeEndOfSlides++;
+			} 
+			else {
+				rawImageData = www.downloadHandler.data;
+				countToAssumeEndOfSlides = 0;
+				Debug.Log ("Img Length: " + rawImageData.Length);
+			}
+		}
 
 		yield return waitHalfASec;
 
 		if (rawImageData == null) {
-			StartCoroutine (GetJpgSlides ());
+			yield return StartCoroutine (GetJpgSlides ());
 			yield break;
 		}
-		if (rawImageData.Length < 100) {
-			StartCoroutine (GetJpgSlides ());
+		else if (rawImageData.Length < oneHundredK) {
+			yield return StartCoroutine (GetJpgSlides ());
 			yield break;
 		}
 
@@ -71,26 +86,6 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 		DataModel.JpgSlideList.Add (currentImageLocalPath);
 
 		slideNumber++;
-		StartCoroutine (GetJpgSlides());
-		yield break;
-	}
-
-	IEnumerator GetImageRawData(string fullVideoUrl) {
-		using (UnityWebRequest www = UnityWebRequest.Get(fullVideoUrl))
-		{
-			www.SetRequestHeader ("User-Agent", DataModel.RequestUserAgent);
-			yield return www.SendWebRequest();
-
-			if (www.isNetworkError || www.isHttpError) {
-				rawImageData = null;
-				countToAssumeEndOfSlides++;
-			} 
-			else {
-				rawImageData = www.downloadHandler.data;
-				Debug.Log ("Img Length: " + rawImageData.Length);
-			}
-		}
-
-		yield return null;
+		yield return StartCoroutine (GetJpgSlides());
 	}
 }

@@ -11,8 +11,9 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 	private string videoExtension;
 	private byte[] rawVideoData;
 	private WaitForSeconds waitHalfASec = new WaitForSeconds(0.5f);
-	private WaitForSeconds waitThreeSecs = new WaitForSeconds(3);
+	private WaitForSeconds waitThreeAndAHalfSecs = new WaitForSeconds(3.5f);
 	private WaitUntil waitForQueue = new WaitUntil(() => DataModel.LocalVideoQueue.Count < 5);
+	private const int TenK = 10000;
 
 	void Start () {
 		videoNumber = 0;
@@ -30,64 +31,22 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 	}
 
 	IEnumerator GetVideoFromServer() {
-		while (true) {
-			yield return waitForQueue;
+		yield return waitForQueue;
 
-			var fullVideoUrl = string.Empty;
-			fullVideoUrl =
-			"http://" +
-			DataModel.ServerIpAddress +
-			":" +
-			DataModel.VideoServerPort.ToString () +
-			"/video/" +
-			videoNumber.ToString () +
-			videoExtension;
-		
-			Debug.Log ("Getting video: " + fullVideoUrl);
+		var fullVideoUrl = string.Empty;
+		fullVideoUrl =
+		"http://" +
+		DataModel.ServerIpAddress +
+		":" +
+		DataModel.VideoServerPort.ToString () +
+		"/video/" +
+		videoNumber.ToString () +
+		videoExtension;
+	
+		Debug.Log ("Getting video: " + fullVideoUrl);
 
-			rawVideoData = null;
-			StartCoroutine (GetVideoRawDataFromUrl (fullVideoUrl));
+		rawVideoData = null;
 
-			yield return waitHalfASec;
-
-			if (rawVideoData == null) {
-				yield return waitThreeSecs;
-				StartCoroutine (GetVideoFromServer ());
-				yield break;
-			}
-			if (rawVideoData.Length < 1000) {
-				yield return waitThreeSecs;
-				StartCoroutine (GetVideoFromServer ());
-				yield break;
-			}
-			
-			var currentVideoLocalPath = Application.temporaryCachePath + "/" + videoNumber.ToString () + videoExtension;
-			Debug.Log ("Saving temp file to: " + currentVideoLocalPath);
-
-			File.WriteAllBytes (
-				currentVideoLocalPath, 
-				rawVideoData);
-
-			while (!File.Exists (currentVideoLocalPath)) {
-				Debug.Log ("Waiting for temp file to be created");
-				yield return null;
-			}
-			
-			while (DataModel.LocalVideoQueueBusy) {
-				yield return null;
-			}
-
-			DataModel.LocalVideoQueueBusy = true;
-			DataModel.LocalVideoQueue.Enqueue (currentVideoLocalPath);
-			DataModel.LocalVideoQueueBusy = false;
-
-			videoNumber++;
-
-			yield return null;
-		}
-	}
-
-	IEnumerator GetVideoRawDataFromUrl(string fullVideoUrl) {
 		using (UnityWebRequest www = UnityWebRequest.Get(fullVideoUrl))
 		{
 			www.SetRequestHeader ("User-Agent", DataModel.RequestUserAgent);
@@ -102,6 +61,43 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 			}
 		}
 
-		yield return null;
+		yield return waitHalfASec;
+
+		if (rawVideoData == null) {
+			yield return waitThreeAndAHalfSecs;
+			yield return StartCoroutine (GetVideoFromServer ());
+			yield break;
+		}
+		else if (rawVideoData.Length < TenK) {
+			yield return waitThreeAndAHalfSecs;
+			yield return StartCoroutine (GetVideoFromServer ());
+			yield break;
+		}
+		
+		var currentVideoLocalPath = 
+			Application.temporaryCachePath + "/" + videoNumber.ToString () + videoExtension;
+		Debug.Log ("Saving temp file to: " + currentVideoLocalPath);
+
+		File.WriteAllBytes (
+			currentVideoLocalPath, 
+			rawVideoData);
+
+		while (!File.Exists (currentVideoLocalPath)) {
+			Debug.Log ("Waiting for temp file to be created");
+			yield return null;
+		}
+		
+		while (DataModel.LocalVideoQueueBusy) {
+			yield return null;
+		}
+
+		DataModel.LocalVideoQueueBusy = true;
+		DataModel.LocalVideoQueue.Enqueue (currentVideoLocalPath);
+		DataModel.LocalVideoQueueBusy = false;
+
+		videoNumber++;
+
+		yield return StartCoroutine (GetVideoFromServer ());
+		yield break;
 	}
 }
