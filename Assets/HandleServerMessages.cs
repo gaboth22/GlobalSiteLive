@@ -22,6 +22,10 @@ public class HandleServerMessages : MonoBehaviour {
 		DataModel.ApplicationNetworkClient.RegisterHandler (
 			CustomMessageType.StartPlayback,
 			OnStartPlaybackMessage);
+
+		DataModel.ApplicationNetworkClient.RegisterHandler (
+			CustomMessageType.SlidesInfo,
+			OnSlidesInfoMessage);
 		
 		yield return null;
 	}
@@ -39,5 +43,12 @@ public class HandleServerMessages : MonoBehaviour {
 			Debug.Log ("Received start playback message");
 			DataModel.VideoPlaybackEnabled = true;
 		}
+	}
+
+	void OnSlidesInfoMessage(NetworkMessage netMsg) {
+		var msg = netMsg.ReadMessage<SlidesInfoMesssage> ();
+		DataModel.JpgSlideListIndex = msg.slidesIndex;
+		DataModel.ShouldDisplaySlides = msg.slidesEnabled;
+		Debug.Log ("Received slides update message");
 	}
 }
