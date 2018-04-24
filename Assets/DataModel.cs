@@ -15,4 +15,9 @@ public class DataModel {
 	public static Queue<string> LocalStaleVideoQueue = new Queue<string> ();
 	public static Vector3 ProfessorPointerPosition = new Vector3(-1f, -1f, -1f);
 	public static bool VideoPlaybackEnabled = false;
+	public static string YoutubeLiveVideoUrl = string.Empty;
+	public static string PdfSlidesInputPath = string.Empty;
+	public static List<string> JpgSlideList = new List<string>();
+	public static int JpgSlideListIndex = 0;
+	public static bool ShouldDisplaySlides = false;
 }

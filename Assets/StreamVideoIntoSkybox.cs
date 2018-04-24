@@ -8,45 +8,47 @@ using System.IO;
 public class StreamVideoIntoSkybox : MonoBehaviour {
 	private VideoPlayer videoPlayer;
 	private bool shouldAttemptToPlayFirstVideo;
+	private WaitUntil waitForQueueToHaveData;
+	private WaitUntil waitForQueueNotToBeBusy;
 
 	void Start() {
 		videoPlayer = GetComponent<VideoPlayer> ();
 		videoPlayer.loopPointReached += LoadNewVideo;
+		videoPlayer.errorReceived += SkipVideo;
 		shouldAttemptToPlayFirstVideo = true;
+		waitForQueueToHaveData = new WaitUntil (() => DataModel.LocalVideoQueue.Count > 0);
+		waitForQueueNotToBeBusy = new WaitUntil (() => !DataModel.LocalVideoQueueBusy);
+		StartCoroutine (PlayFirstVideo ());
+	}
+		
+	IEnumerator PlayFirstVideo() {
+		yield return new WaitUntil (
+			() => DataModel.LocalVideoQueue.Count >= 5 && DataModel.VideoPlaybackEnabled);
+
+		yield return StartCoroutine (StreamVideo ());
 	}
 
-	void Update() {
-		if (shouldAttemptToPlayFirstVideo) {
-			if (!DataModel.LocalVideoQueueBusy) {
-				DataModel.LocalVideoQueueBusy = true;
-
-				if (DataModel.LocalVideoQueue.Count >= 5 && DataModel.VideoPlaybackEnabled) {
-					shouldAttemptToPlayFirstVideo = false;
-					DataModel.LocalVideoQueueBusy = false;
-					StartCoroutine (StreamVideo ());
-				} 
-				else {
-					DataModel.LocalVideoQueueBusy = false;
-				}
-			}
-		}
+	void SkipVideo(VideoPlayer vidPlayer, string message) {
+		Debug.Log ("Skipping video: " + vidPlayer.url + " because: \n" + message);
+		LoadNewVideo (vidPlayer);
 	}
 
 	IEnumerator StreamVideo() {
 
-		while (DataModel.LocalVideoQueue.Count == 0) {
-			yield return null;
-		}
-
-		while (DataModel.LocalVideoQueueBusy) {
-			yield return null;
-		}
+		yield return waitForQueueToHaveData;
+		yield return waitForQueueNotToBeBusy;
 
 		DataModel.LocalVideoQueueBusy = true;
 
 		if (DataModel.LocalVideoQueue.Count > 0) {
-			videoPlayer.url = DataModel.LocalVideoQueue.Dequeue ();
+			var currentVideoToPlay = DataModel.LocalVideoQueue.Dequeue ();
 			DataModel.LocalVideoQueueBusy = false;
+
+			while (!File.Exists (currentVideoToPlay)) {
+				yield return null;
+			}
+
+			videoPlayer.url = currentVideoToPlay;
 			videoPlayer.Prepare ();
 
 			while (!videoPlayer.isPrepared) {
@@ -54,9 +56,11 @@ public class StreamVideoIntoSkybox : MonoBehaviour {
 			}
 			
 			videoPlayer.Play ();
+		} 
+		else {
+			DataModel.LocalVideoQueueBusy = false;
 		}
-		DataModel.LocalVideoQueueBusy = false;
-		yield return null;
+		yield break;
 	}
 
 	void LoadNewVideo(VideoPlayer videoPlayer) {
