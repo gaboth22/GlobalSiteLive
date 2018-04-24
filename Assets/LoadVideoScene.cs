@@ -24,6 +24,7 @@ public class LoadVideoScene : MonoBehaviour {
 		yield return new WaitUntil (() => !string.IsNullOrEmpty(DataModel.ServerIpAddress));
 		#else
 		yield return new WaitUntil (() => !string.IsNullOrEmpty(DataModel.YoutubeLiveVideoUrl));
+		yield return new WaitUntil (() => !string.IsNullOrEmpty(DataModel.PdfSlidesInputPath));
 		#endif
 
 		#if UNITY_ANDROID

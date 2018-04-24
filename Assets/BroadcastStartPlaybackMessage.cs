@@ -35,7 +35,7 @@ public class BroadcastStartPlaybackMessage : MonoBehaviour {
 				
 	void OnGUI() {
 		if (showStartInfo) {
-			GUI.Box (new Rect (40, 30, 150, 20), "Connected: " + Network.connections.Length);
+			GUI.Box (new Rect (40, 30, 150, 20), "Connected: " + NetworkServer.connections.Count);
 			GUI.Box (new Rect (40, 50, 150, 40), "Share IP and port \nwith students");
 			GUI.Box (new Rect (40, 90, 150, 20), "IP: " + localIp);
 			GUI.Box (new Rect (40, 110, 150, 20), "Port: " + DataModel.VideoServerPort);

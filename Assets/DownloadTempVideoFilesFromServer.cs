@@ -11,7 +11,7 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 	private string videoExtension;
 	private byte[] rawVideoData;
 	private WaitForSeconds waitHalfASec = new WaitForSeconds(0.5f);
-	private WaitForSeconds waitTwoSecs = new WaitForSeconds(2);
+	private WaitForSeconds waitThreeSecs = new WaitForSeconds(3);
 	private WaitUntil waitForQueue = new WaitUntil(() => DataModel.LocalVideoQueue.Count < 5);
 
 	void Start () {
@@ -51,12 +51,12 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 			yield return waitHalfASec;
 
 			if (rawVideoData == null) {
-				yield return waitTwoSecs;
+				yield return waitThreeSecs;
 				StartCoroutine (GetVideoFromServer ());
 				yield break;
 			}
-			if (rawVideoData.Length < 100) {
-				yield return waitTwoSecs;
+			if (rawVideoData.Length < 1000) {
+				yield return waitThreeSecs;
 				StartCoroutine (GetVideoFromServer ());
 				yield break;
 			}
