@@ -5,15 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/ServerInfoSceneDesktop.unity
     guid: aaf04ae52634b49eebda296f35fa61fc
-  - enabled: 0
+  - enabled: 1
     path: Assets/360VideoSceneDesktop.unity
     guid: 164ff7b6d3a9a4126aff5eb5bf5ca50d
-  - enabled: 1
+  - enabled: 0
     path: Assets/ServerInfoScene.unity
     guid: 1612b7b435c304676813a8975a35d400
-  - enabled: 1
+  - enabled: 0
     path: Assets/360VideoScene.unity
     guid: 305324cf15e0643efb7080dd279270a3
+  - enabled: 1
+    path: Assets/Preview.unity
+    guid: d54c73a8498ae85498f9f9a67488db9e
