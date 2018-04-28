@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 public class ConnectToNetworkServer : MonoBehaviour {
 
 	int connectionRetries;
-	const int MaxConnectionRetries = 5;
+	const int MaxConnectionRetries = 10;
 
 	void Start() {
 		connectionRetries = 0;

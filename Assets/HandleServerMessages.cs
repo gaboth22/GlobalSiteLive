@@ -1,11 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Video;
 
 public class HandleServerMessages : MonoBehaviour {
+	private VideoPlayer videoPlayer;
 
 	void Start () {
+		videoPlayer = GetComponent<VideoPlayer> ();
 		StartCoroutine (WaitForClientInitialization ());
 	}
 
@@ -26,6 +30,10 @@ public class HandleServerMessages : MonoBehaviour {
 		DataModel.ApplicationNetworkClient.RegisterHandler (
 			CustomMessageType.SlidesInfo,
 			OnSlidesInfoMessage);
+
+		DataModel.ApplicationNetworkClient.RegisterHandler (
+			CustomMessageType.VideoSync,
+			OnVideoSyncMessage);
 		
 		yield return null;
 	}
@@ -50,5 +58,35 @@ public class HandleServerMessages : MonoBehaviour {
 		DataModel.JpgSlideListIndex = msg.slidesIndex;
 		DataModel.ShouldDisplaySlides = msg.slidesEnabled;
 		Debug.Log ("Received slides update message");
+	}
+
+	void OnVideoSyncMessage(NetworkMessage netMsg) {
+		var msg = netMsg.ReadMessage<VideoSyncMessage> ();
+		DataModel.LocalVideoQueueBusy = true;
+		DataModel.LocalStaleVideoQueueBusy = true;
+
+		bool stop = false;
+		while (DataModel.LocalVideoQueue.Count > 0 && !stop) {
+			var nextVid = DataModel.LocalVideoQueue.Peek ();
+			var vidNum = GetVideoNumberFromName (nextVid);
+
+			if (vidNum < msg.currentVideoNumber) {
+				DataModel.LocalStaleVideoQueue.Enqueue (
+					DataModel.LocalVideoQueue.Dequeue ());
+			} 
+			else {
+				stop = true;
+			}
+		}
+
+		DataModel.LocalVideoQueueBusy = false;
+		DataModel.LocalStaleVideoQueueBusy = false;
+	}
+
+	int GetVideoNumberFromName(string name) {
+		char[] delimiter = { '\\', '/', '.'};
+		string[] brokenDownPath = name.Split (delimiter);
+		var videoNumber = brokenDownPath [brokenDownPath.Length - 2]; 
+		return Convert.ToInt32 (videoNumber);
 	}
 }

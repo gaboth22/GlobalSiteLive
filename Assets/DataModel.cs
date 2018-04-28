@@ -20,4 +20,6 @@ public class DataModel {
 	public static List<string> JpgSlideList = new List<string>();
 	public static int JpgSlideListIndex = 0;
 	public static bool ShouldDisplaySlides = false;
+	public static int CurrentVideoNumber = 0;
+	public static int VideosPlayedCount = 0;
 }
