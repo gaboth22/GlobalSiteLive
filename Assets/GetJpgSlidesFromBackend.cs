@@ -12,7 +12,7 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 	private byte[] rawImageData;
 	private int slideNumber;
 	private string slideExtension = ".jpg";
-	private const int oneHundredK = 100000;
+	private const int OneK = 1000;
 
 	void Start () {
 		countToAssumeEndOfSlides = 0;
@@ -27,7 +27,7 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 	}
 
 	IEnumerator GetJpgSlides() {
-		if (countToAssumeEndOfSlides > 5)
+		if (countToAssumeEndOfSlides > 10)
 			yield break;
 
 		var slideName = 
@@ -70,13 +70,16 @@ public class GetJpgSlidesFromBackend : MonoBehaviour {
 			yield return StartCoroutine (GetJpgSlides ());
 			yield break;
 		}
-		else if (rawImageData.Length < oneHundredK) {
+		else if (rawImageData.Length < OneK) {
 			yield return StartCoroutine (GetJpgSlides ());
 			yield break;
 		}
 
 		var currentImageLocalPath = 
-			pathToSaveSlides + "/" + slideName + slideExtension;
+			pathToSaveSlides +
+			Path.DirectorySeparatorChar +
+			slideName + 
+			slideExtension;
 		Debug.Log ("Saving slide to: " + currentImageLocalPath);
 
 		File.WriteAllBytes (

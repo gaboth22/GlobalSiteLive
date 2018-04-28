@@ -75,7 +75,10 @@ public class DownloadTempVideoFilesFromServer : MonoBehaviour {
 		}
 		
 		var currentVideoLocalPath = 
-			Application.temporaryCachePath + "/" + videoNumber.ToString () + videoExtension;
+			Application.temporaryCachePath +
+			Path.DirectorySeparatorChar + 
+			videoNumber.ToString () + 
+			videoExtension;
 		Debug.Log ("Saving temp file to: " + currentVideoLocalPath);
 
 		File.WriteAllBytes (
